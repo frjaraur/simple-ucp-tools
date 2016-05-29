@@ -24,8 +24,9 @@ GetCA(){
 }
 
 GetDTRCA(){
-	dtr="$(echo $ucp_url|sed -e "s/\https\:\/\//g")"
-	openssl s_client -connect ${dtr} -showcerts </dev/null 2>/dev/null | openssl x509 -outform PEM >$dtr.crt
+	dtr_port="$(echo $ucp_url|sed -e "s/https\:\/\///g")"
+	dtr="$(echo ${dtr_port}|cut -d ':' -f1)"
+	openssl s_client -connect ${dtr_port} -showcerts </dev/null 2>/dev/null | openssl x509 -outform PEM >${dtr}.crt
 	exit 0
 }
 
@@ -36,7 +37,7 @@ ucp_password="orca"
 getca=0
 getdtrca=0
  
-while getopts "hu:p:n:c" opt; do
+while getopts "hu:p:n:cd" opt; do
   case $opt in
     h)
       Help
@@ -67,13 +68,14 @@ while getopts "hu:p:n:c" opt; do
   esac
 done
 
-[ ! -n "$ucp_url" ] && echo "At least UCP Fully Qualified Name is Required !!!!" && exit 1
+[ ! -n "${ucp_url}" ] && echo "At least UCP Fully Qualified Name is Required !!!!" && exit 1
 
-[ $getca -eq 1 -a $getdtrca -eq 1 ] && echo "Isn't possible to have DTR and UCP on same host/port ..." && exit 1
+[ ${getca} -eq 1 -a ${getdtrca} -eq 1 ] && echo "It is not possible to have DTR and UCP on same host/port ..." && exit 1
 
-[ $getca -eq 1 ] && GetCA
+[ ${getca} -eq 1 ] && GetCA
 
-[ $getdtrca -eq 1 ] && GetDTRCA
+echo "UCP $ucp_url"
+[ ${getdtrca} -eq 1 ] && GetDTRCA
 
 echo -e "\nUCP URL:\t$ucp_url"
 echo -e "\nUCP USERNAME:\t$ucp_username"
