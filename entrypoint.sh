@@ -12,6 +12,7 @@ Help(){
 GetBundle(){
 
 	AUTHTOKEN=$(curl -sk -d "{\"username\":\"${ucp_username}\",\"password\":\"${ucp_password}\"}" ${ucp_url}/auth/login | jq -r .auth_token)
+	[ $? -ne 0 ] && echo "ERROR.... please check URL/PORT for UCP ..." && exit 1
 	curl -sk -H "Authorization: Bearer $AUTHTOKEN" ${ucp_url}/api/clientbundle -o bundle.zip >/dev/null 2>&1
 	unzip  -qqo bundle.zip 2>/dev/null
 	rm bundle.zip
@@ -74,7 +75,6 @@ done
 
 [ ${getca} -eq 1 ] && GetCA
 
-echo "UCP $ucp_url"
 [ ${getdtrca} -eq 1 ] && GetDTRCA
 
 echo -e "\nUCP URL:\t$ucp_url"
