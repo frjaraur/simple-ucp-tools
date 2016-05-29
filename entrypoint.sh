@@ -3,7 +3,8 @@
 Help(){
 	echo -e "\n\nSimple UCP-Tools Usage"
 	echo -e "\n\t docker run --rm --name simple-ucp-tools -v <YOUR_OUTPUT_DIR>:/OUTDIR simple-ucp-tools <OPTION>"
-	echo -e "\n\t OPTIONS:\n\t\t-h This Help\n\t\t-n UCP_URL_WITH_PORT (if not default 443 port)\n\t\t-u UCP_USERNAME (defaults to 'admin')\n\t\t-p USP_PASSWORD (defaults to 'orca')\n\t\t-c Downloads ucp CA as ucp-ca.pem "
+	echo -e "\n\t OPTIONS:\n\t\t-h This Help\n\t\t-n UCP_URL_WITH_PORT/DTR_URL_WITH_PORT (if not default 443 port)\n\t\t-u UCP_USERNAME (defaults to 'admin')\n\t\t-p USP_PASSWORD (defaults to 'orca')\n\t\t-c Downloads UCP CA as ucp-ca.pem\n\t\t-d Downloads DTR CA as <DTR>.crt"
+	echo -e " \n\nWhen using for DTR CA download you must move <DTR>.crt file to trusted system certs and them update them using system commands."
 	echo -e "\n\n"
 	exit 0
 }
@@ -22,11 +23,18 @@ GetCA(){
 	exit 0
 }
 
+GetDTRCA(){
+	dtr="$(echo $ucp_url|sed -e "s/\https\:\/\//g")"
+	openssl s_client -connect ${dtr} -showcerts </dev/null 2>/dev/null | openssl x509 -outform PEM >$dtr.crt
+	exit 0
+}
+
 
 #DEFAULTS:
 ucp_username="admin"
 ucp_password="orca"
 getca=0
+getdtrca=0
  
 while getopts "hu:p:n:c" opt; do
   case $opt in
@@ -36,6 +44,9 @@ while getopts "hu:p:n:c" opt; do
     c)
       getca=1
       ;;
+    d)
+      getdtrca=1
+      ;;      
     n)
       ucp_url=$OPTARG
       ;;
@@ -58,7 +69,11 @@ done
 
 [ ! -n "$ucp_url" ] && echo "At least UCP Fully Qualified Name is Required !!!!" && exit 1
 
+[ $getca -eq 1 -a $getdtrca -eq 1 ] && echo "Isn't possible to have DTR and UCP on same host/port ..." && exit 1
+
 [ $getca -eq 1 ] && GetCA
+
+[ $getdtrca -eq 1 ] && GetDTRCA
 
 echo -e "\nUCP URL:\t$ucp_url"
 echo -e "\nUCP USERNAME:\t$ucp_username"
