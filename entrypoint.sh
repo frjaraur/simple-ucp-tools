@@ -2,7 +2,7 @@
 
 Help(){
 	echo -e "\n\nSimple UCP-Tools Usage"
-	echo -e "\n\t docker run --rm --name hopla/ucptools -v <YOUR_OUTPUT_DIR>:/OUTDIR simple-ucp-tools <OPTION>"
+	echo -e "\n\t docker run --rm --name ucptools -v <YOUR_OUTPUT_DIR>:/OUTDIR hopla/ucptools <OPTION>"
 	echo -e "\n\t OPTIONS:\n\t\t-h This Help\n\t\t-n UCP_URL_WITH_PORT/DTR_URL_WITH_PORT (if not default 443 port, for example https://myucp.mydomain.com:8443)\n\t\t-u UCP_USERNAME (defaults to admin')\n\t\t-p UCP_PASSWORD (defaults to 'orca')\n\t\t-c Downloads UCP CA as ucp-ca.pem\n\t\t-d Downloads DTR CA as <DTR>.crt\n\t\t-i USERID:GROUPID for the bundle files permissions (defaults to root)."
 	echo -e " \n\nWhen using for DTR CA download you must move <DTR>.crt file to trusted system certs and them update them using system commands."
 	echo -e "\n\n"
