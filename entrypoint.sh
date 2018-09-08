@@ -16,6 +16,7 @@ GetBundle(){
 	mkdir -p /OUTDIR/bundle-${ucp_username}
 	mv bundle.zip /OUTDIR/bundle-${ucp_username} && cd /OUTDIR/bundle-${ucp_username}
 	unzip  -qqo bundle.zip 2>/dev/null
+	[ $? -ne 0 ] && echo "Can not load bundle" && rm -rf  /OUTDIR/bundle-${ucp_username} && exit 1
 	rm -f bundle.zip 2>/dev/null
 	chown -R ${userid}:${groupid} /OUTDIR/bundle-${ucp_username}
 	exit 0
